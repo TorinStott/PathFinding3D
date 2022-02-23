@@ -7,8 +7,6 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import * as THREE from "three";
 import Navigation from './Navigation';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { RedFormat } from 'three';
-import queryString from 'query-string';
 
 const scene = new THREE.Scene();
 const camera = new THREE.Camera();
@@ -18,10 +16,9 @@ const CameraController = () => {
   const { camera, gl } = useThree();
   useEffect(() => {
       const controls = new OrbitControls(camera, gl.domElement);
-      controls.position0 = 100;
       controls.minDistance = 5;
       controls.maxDistance = 20;
-      camera.position.set(0,50,10);
+      camera.position.set(0,50,0);
       controls.update();
       return () => {
         controls.dispose();
@@ -32,22 +29,15 @@ const CameraController = () => {
   return null;
 }
 
-var raycaster = new THREE.Raycaster();
-var intersects = raycaster.intersectObject(scene, true);
-
-if (intersects.length > 0) {
-    var object = intersects[0].object;
-    console.log(object);
-    object.material.color.set( Math.random() * 0xffffff );
-}
-
 var counter = 0;
-const boxesGrid = [];
 const gridDimensions = 20;
+const boxesGrid = [gridDimensions*gridDimensions];
 function Box(props) {
   const box = useRef();
+  //BoxBuffer is faster
   const boxesGeometry = new THREE.BoxBufferGeometry(0.5, 0.5, 0.5);
   const boxSelectedColor = new THREE.Color('red')
+  //Make cursor pointer on each box
   let pointerOver = false;
   const [hovered, setHovered] = useState(false)
   useEffect(() => {
@@ -72,8 +62,16 @@ function Box(props) {
       )
     }
   }
+  analyze(boxesGrid);
   return null
 }
+
+function analyze(boxesGrid) {
+  console.log(boxesGrid[100].color);
+}
+
+
+// Change the cursor to color cubes differently
 const green = new THREE.Color('green')
 const red = new THREE.Color('red')
 const brown = new THREE.Color('black')
@@ -101,7 +99,9 @@ function App() {
   <>
   <Navigation/>
   <Canvas>
+    {/* initialize template box */}
     <Box material={'white'}></Box>
+    {/* initialize grid of boxes */}
     {boxesGrid}
     <CameraController />
     <ambientLight intensity={0.5} />
