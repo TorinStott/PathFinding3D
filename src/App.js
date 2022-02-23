@@ -7,6 +7,8 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import * as THREE from "three";
 import Navigation from './Navigation';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { RedFormat } from 'three';
+import queryString from 'query-string';
 
 const scene = new THREE.Scene();
 const camera = new THREE.Camera();
@@ -45,9 +47,7 @@ const gridDimensions = 20;
 function Box(props) {
   const box = useRef();
   const boxesGeometry = new THREE.BoxBufferGeometry(0.5, 0.5, 0.5);
-  const boxDefaultColor = new THREE.Color('white')
   const boxSelectedColor = new THREE.Color('red')
-  const boxClickedColor = new THREE.Color('green')
   let pointerOver = false;
   const [hovered, setHovered] = useState(false)
   useEffect(() => {
@@ -60,9 +60,11 @@ function Box(props) {
       <>
       <mesh ref={box} key={counter} 
       geometry={boxesGeometry} position={[x,0,z]}
-      onPointerOver={(e) => e.object.material.color = boxSelectedColor}
+      // onPointerOver={(e) => e.object.material.color = boxSelectedColor}
       // onPointerOut={(e) => e.object.material.color = boxDefaultColor}
-      onPointerDown={(e) => e.object.material.color = boxClickedColor}
+      onPointerOver={(e) => e.object.material.color = setHovered(true)}
+      onPointerOut={(e) => e.object.material.color = setHovered(false)}
+      onPointerDown={(e) => e.object.material.color = getInputType()}
       >
       <meshStandardMaterial color={'white'}></meshStandardMaterial>
       </mesh>
@@ -72,13 +74,32 @@ function Box(props) {
   }
   return null
 }
-function changeColor(e){
-  
-}
+const green = new THREE.Color('green')
+const red = new THREE.Color('red')
+const brown = new THREE.Color('black')
+const boxDefaultColor = new THREE.Color('white')
+  function getInputType(){
+    const url = window.location.href
+    if(url.includes("start")) {
+      return green;
+    }
+    else if(url.includes("walls")) {
+      return brown;
+    }
+    else if(url.includes("end")) {
+      return red;
+    }
+    else if(url.includes("erase")) {
+      return boxDefaultColor;
+    }
+    // else {
+    //   alert("Select a Path");
+    // }
+  }
 function App() {
   return(
   <>
-  <Navigation />
+  <Navigation/>
   <Canvas>
     <Box material={'white'}></Box>
     {boxesGrid}

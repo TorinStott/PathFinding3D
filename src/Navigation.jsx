@@ -1,5 +1,6 @@
 import { Navbar, Nav, NavItem, NavDropdown, MenuItem } from 'react-bootstrap';
 const Navigation = () => {
+  
   return (
   <div className="container">
     <Navbar fixed="top" bg="white" expand="lg">
@@ -7,9 +8,10 @@ const Navigation = () => {
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
-            <Nav.Link href="#home">Starting Node</Nav.Link>
-            <Nav.Link href="#link">Ending Node</Nav.Link>
-            <Nav.Link href="#link">Walls</Nav.Link>
+            <Nav.Link href="#start">Starting Node</Nav.Link>
+            <Nav.Link href="#end">Ending Node</Nav.Link>
+            <Nav.Link href="#walls">Walls</Nav.Link>
+            <Nav.Link href="#erase">Erase Nodes</Nav.Link>
             <NavDropdown title="Algorithms" id="basic-nav-dropdown">
               <NavDropdown.Item href="#action/3.1">Djikstra's</NavDropdown.Item>
               <NavDropdown.Item href="#action/3.2">A*</NavDropdown.Item>
