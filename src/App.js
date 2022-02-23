@@ -11,8 +11,6 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 const scene = new THREE.Scene();
 const camera = new THREE.Camera();
 const tempBoxes = new THREE.Object3D();
-const raycaster = new THREE.Raycaster();
-const pointer = new THREE.Vector2();
 
 const CameraController = () => {
   const { camera, gl } = useThree();
@@ -32,55 +30,58 @@ const CameraController = () => {
   return null;
 }
 
-// Raycasting work in progress
+var raycaster = new THREE.Raycaster();
+var intersects = raycaster.intersectObject(scene, true);
 
-//   function onPointerMove(event) {
-//     pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-//     pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-//   }
-//   // update the picking ray with the camera and pointer position
-//   raycaster.setFromCamera( pointer, camera );
-//   // calculate objects intersecting the picking ray
-//   const intersects = raycaster.intersectObjects( scene.children );
-//   for (let i = 0; i < intersects.length; i ++) {
-//     intersects[i].object.material.color.set( 0xff0000 );
-//     console.log(intersects);
-//   }
-//   gl.render( scene, camera );
-//   window.addEventListener('pointermove', onPointerMove);
-// };
+if (intersects.length > 0) {
+    var object = intersects[0].object;
+    console.log(object);
+    object.material.color.set( Math.random() * 0xffffff );
+}
 
-
-const BoxGrid = ({ i, j }) => {
-  const material = new THREE.MeshLambertMaterial({ color: 0x666666 });
+var counter = 0;
+const boxesGrid = [];
+const gridDimensions = 20;
+function Box(props) {
+  const box = useRef();
   const boxesGeometry = new THREE.BoxBufferGeometry(0.5, 0.5, 0.5);
-  const ref = useRef();
-
-  useFrame(({ clock }) => {
-    let counter = 0;
-    const t = clock.oldTime * 0.001;
-    for (let x = 0; x < i; x++) {
-      for (let z = 0; z < j; z++) {
-        const id = counter++;
-        tempBoxes.position.set(i / 2 - x, 0, j / 2 - z);
-        tempBoxes.updateMatrix();
-        ref.current.setMatrixAt(id, tempBoxes.matrix);
-        scene.add(tempBoxes)
-      }
+  const boxDefaultColor = new THREE.Color('white')
+  const boxSelectedColor = new THREE.Color('red')
+  const boxClickedColor = new THREE.Color('green')
+  let pointerOver = false;
+  const [hovered, setHovered] = useState(false)
+  useEffect(() => {
+    document.body.style.cursor = hovered ? 'pointer' : 'auto'
+  }, [hovered])
+  for(let x=0;x<gridDimensions;x++){
+    for(let z=0;z<gridDimensions;z++) {
+      counter++;
+      boxesGrid.push(
+      <>
+      <mesh ref={box} key={counter} 
+      geometry={boxesGeometry} position={[x,0,z]}
+      onPointerOver={(e) => e.object.material.color = boxSelectedColor}
+      // onPointerOut={(e) => e.object.material.color = boxDefaultColor}
+      onPointerDown={(e) => e.object.material.color = boxClickedColor}
+      >
+      <meshStandardMaterial color={'white'}></meshStandardMaterial>
+      </mesh>
+      </>
+      )
     }
-    ref.current.instanceMatrix.needsUpdate = true;
-  });
-
-  return <instancedMesh ref={ref} args={[boxesGeometry, material, i * j]} />;
-};
-
-
+  }
+  return null
+}
+function changeColor(e){
+  
+}
 function App() {
   return(
   <>
   <Navigation />
   <Canvas>
-    <BoxGrid i={20} j={20} />
+    <Box material={'white'}></Box>
+    {boxesGrid}
     <CameraController />
     <ambientLight intensity={0.5} />
     <spotLight position={[10,15,10]} angle={0.9}/>
